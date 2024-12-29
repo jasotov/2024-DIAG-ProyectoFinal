@@ -3,6 +3,7 @@ from flask_bootstrap import Bootstrap5
 from openai import OpenAI
 from dotenv import load_dotenv
 
+# Carga variable de entorno con API KEY OPenAI
 load_dotenv()
 
 client = OpenAI()
