@@ -1,18 +1,66 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Next Muby (BETA)
-{% endblock %}
-
 {% block content %}
-    <h1>Next Muby (BETA)</h1>
-    <p>Haz click en el botón de abajo para obtener una recomendación</p>
-    <form method="post">
-        <input type="submit" name="intent" value="Quiero tener suerte" class="btn btn-primary" />
-    </form>
-
-    {% if recommendation %}
-        <h2>Recomendación</h2>
-        <p>{{ recommendation }}</p>
-    {% endif %}
+<div class="container col-md-10 px-2 py-2 h-100">
+    <div class="card" style="max-height: 600px; vertical-align: middle;">
+        <div class="card-header" title="Mensajes Rápidos">
+            <form method="POST" id="form-chat1">
+                <div class="my-3 text-center">
+                    Quiero ver una &nbsp;
+                    <div class="btn btn-outline-secondary">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="Pelicula" {{chk1}}>
+                            <label class="form-check-label" for="inlineRadio1">Película</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="Serie" {{chk2}}>
+                            <label class="form-check-label" for="inlineRadio2">Serie</label>
+                        </div>
+                    </div>
+                    &nbsp;de&nbsp;
+                    <div class="btn-group shadow-0" role="group" aria-label="Basic example">
+                        <button type="submit" id="intent" name="intent" value="CF" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Ciencia Ficción</button>
+                        <button type="submit" id="intent" name="intent" value="S" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Suspenso</button>
+                        <button type="submit" id="intent" name="intent" value="C" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Comedia</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-body overflow-y-auto" id="ScrollableDiv">
+            <div class=" px-4 py-5" >
+                {% for message in messages %}
+                    {% if message.author == 'assistant' %}
+                        <div class="d-flex flex-row justify-content-start mb-4">
+                            <img class="bg-white rounded-circle" src="{{ url_for('static', filename='images/muby.png') }}" alt="avatar 1" style="width: 45px; height: 100%;">
+                            <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
+                                <p class="small mb-0">{{message.content}}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="d-flex flex-row justify-content-end mb-4">
+                            <div class="p-3 me-3 border bg-body-tertiary" style="border-radius: 15px;">
+                                <p class="small mb-0">{{message.content}}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-footer">
+            <form method="POST" id="form-chat2">
+                <div class="input-group my-3">
+                    <input name="message" required="required" class="form-control" placeholder="Enviar mensaje a Verflix" aria-label="Tu mensaje" aria-describedby="send-message"/>
+                    <input type="submit" class="btn btn-primary" id="intent" name="intent" value="Enviar"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% include 'perfil.html' %}
 {% endblock %}
+{% block scripts %}
+<script language="javascript">
+    scrollToBottom("ScrollableDiv");
+</script>
+{% endblock %}
+
