@@ -37,6 +37,8 @@ def index():
 def chat(user_id, case):
     user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one()
     # user = db.session.query(User).filter(User.id == user_id).first()
+    sChkF = 'checked'
+    sChkQ = ''
     sChk1 = 'checked'
     sChk2 = ''
 
@@ -47,20 +49,30 @@ def chat(user_id, case):
             db.session.add(session)
 
             # Guarda el primer mensaje de la sesión en la BD
-            sMsg = f"Hola {user.name}! Soy Verflix, un recomendador de películas. ¿En qué te puedo ayudar?"
+            sMsg = f"Hola {user.name}! Soy Verflix, y mi rol es recomendar películas ó series. ¿En qué te puedo ayudar?"
             db.session.add(Message(content=sMsg, author="assistant", user=user, session=session))
             db.session.commit()
         else:
             # session = db.session.execute(db.select(Session).filter_by(user_id=user_id).order_by(Session.created_at.desc)).first()
             session = db.session.query(Session).filter(Session.user_id == user_id).order_by(desc(Session.created_at)).first()
-        
-        return render_template('chat.html', messages=user.messages, usr=user, chk1=sChk1, chk2=sChk2)
+
+        Checks = [sChkF,sChkQ,sChk1,sChk2]
+
+        return render_template('chat.html', messages=user.messages, usr=user, chks=Checks)
 
     intent = request.form.get('intent')
+
+    sMsgType =  request.form.get('MsgType')
+    if sMsgType == 'QuickMsg':
+        sChkF = ''
+        sChkQ = 'checked'
+
     sType =  request.form.get('inlineRadioOptions')
     if sType == 'Serie':
         sChk1 = ''
         sChk2 = 'checked'
+
+    Checks = [sChkF,sChkQ,sChk1,sChk2]
 
     intents = {
         'CF': f'Recomiéndame una {sType} de ciencia ficción',
@@ -78,6 +90,10 @@ def chat(user_id, case):
         db.session.commit()
 
         sMsg = "Eres un chatbot que recomienda películas y series, te llamas 'Verflix'. Tu rol es responder recomendaciones de manera breve y concisa. No repitas recomendaciones."
+
+        sPreferences = Preferences(user.fav_movies,user.fav_series,user.kind_movies)
+        if len(sPreferences) > 0:
+            sMsg += f'Para recomendar, considera los gustos del usuario que te está preguntando, que son los siguientes: {sPreferences}'
 
         messages_for_llm = [{
             "role": "system",
@@ -100,7 +116,7 @@ def chat(user_id, case):
         db.session.add(Message(content=model_recommendation, author="assistant", user=user, session=session))
         db.session.commit()
 
-        return render_template('chat.html', messages=user.messages, usr=user, chk1=sChk1, chk2=sChk2)
+        return render_template('chat.html', messages=user.messages, usr=user, chks=Checks)
 
 
 @app.route('/user/<username>')
@@ -144,3 +160,22 @@ def recommend():
         'recommendation': message,
         'tokens': chat_completion.usage.total_tokens,
     }
+
+def Preferences(sFavMovies, sFavSeries, sFavKinds):
+    sMsg = ''
+    if len(sFavMovies) > 0:
+        sMsg = f'películas favoritas: {sFavMovies}'
+
+    if len(sFavSeries) > 0:
+        if len(sMsg) > 0:
+            sMsg += ';'
+
+        sMsg += f'series favoritas: {sFavSeries}'
+
+    if len(sFavKinds) > 0:
+        if len(sMsg) > 0:
+            sMsg += ';'
+
+        sMsg += f'géneros favoritos de películas y series: {sFavKinds}'
+
+    return sMsg

@@ -3,40 +3,25 @@
 {% block content %}
 <div class="container col-md-10 px-2 py-2 h-100">
     <div class="card" style="max-height: 600px; vertical-align: middle;">
-        <div class="card-header" title="Mensajes Rápidos">
-            <form method="POST" id="form-chat1">
-                <div class="my-3 text-center">
-                    Quiero ver una &nbsp;
-                    <div class="btn btn-outline-secondary">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="Pelicula" {{chk1}}>
-                            <label class="form-check-label" for="inlineRadio1">Película</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="Serie" {{chk2}}>
-                            <label class="form-check-label" for="inlineRadio2">Serie</label>
-                        </div>
-                    </div>
-                    &nbsp;de&nbsp;
-                    <div class="btn-group shadow-0" role="group" aria-label="Basic example">
-                        <button type="submit" id="intent" name="intent" value="CF" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Ciencia Ficción</button>
-                        <button type="submit" id="intent" name="intent" value="S" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Suspenso</button>
-                        <button type="submit" id="intent" name="intent" value="C" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Comedia</button>
-                    </div>
-                </div>
-            </form>
+        <div class="card-header" style="text-align: center;">
+            Chatbot
         </div>
         <div class="card-body overflow-y-auto" id="ScrollableDiv">
             <div class=" px-4 py-5" >
                 {% for message in messages %}
                     {% if message.author == 'assistant' %}
                         <div class="d-flex flex-row justify-content-start mb-4">
-                            <img class="bg-white rounded-circle" src="{{ url_for('static', filename='images/muby.png') }}" alt="avatar 1" style="width: 45px; height: 100%;">
-                            <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
-                                <p class="small mb-0">{{message.content}}</p>
+                            <img class="bg-white rounded-circle" src="{{ url_for('static', filename='images/avatar_verflix_3.png') }}" title="verflix" style="width: 45px; height: 45px;">
+                            <div>
+                                <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
+                                    <p class="small mb-0">{{message.content}}</p>
+                                </div>
+                                <div>
+                                    <p class="small ms-3 mb-3 rounded-3 text-muted" style="font-size: x-small; text-align: right;">{{message.created_at.strftime('%H:%M')}}</p>
+                                </div>
                             </div>
                         </div>
-                    {% else %}
+                {% else %}
                         <div class="d-flex flex-row justify-content-end mb-4">
                             <div class="p-3 me-3 border bg-body-tertiary" style="border-radius: 15px;">
                                 <p class="small mb-0">{{message.content}}</p>
@@ -47,20 +32,59 @@
             </div>
         </div>
         <div class="card-footer">
-            <form method="POST" id="form-chat2">
-                <div class="input-group my-3">
-                    <input name="message" required="required" class="form-control" placeholder="Enviar mensaje a Verflix" aria-label="Tu mensaje" aria-describedby="send-message"/>
-                    <input type="submit" class="btn btn-primary" id="intent" name="intent" value="Enviar"/>
+            <div style="font-size: small;">
+                Mensaje&nbsp;&nbsp;
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="MsgType" id="MsgType1" value="FreeMsg" onclick="showMessageDiv()" {{chks[0]}}>
+                    <label class="form-check-label" for="MsgType1">libre</label>
                 </div>
-            </form>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="MsgType" id="MsgType2" value="QuickMsg" onclick="showMessageDiv()" {{chks[1]}}>
+                    <label class="form-check-label" for="MsgType2">rápido</label>
+                </div>
+            </div>
+            <div id="FreeMsgDiv">
+                <form method="POST" id="formchat2">
+                    <div class="input-group my-3">
+                        <input type="hidden" id="intent" name="intent" value="Enviar"/>
+                        <input name="message" id="message" required="required" class="form-control" placeholder="Enviar mensaje a Verflix" aria-label="Tu mensaje" aria-describedby="send-message"/>
+                        <button class="btn btn-primary" onclick="submitMessage(this)">
+                            <span id="text">Enviar</span>
+                            <span class="spinner-border spinner-border-sm" id="spinner" style="display: none;"></span>
+                        </button>   
+                    </div>
+                </form>
+            </div>
+            <div id="QuickMsgDiv">
+                <form method="POST" id="formchat1">
+                    <div class="my-3 text-center">
+                        Recomiéndame una &nbsp;
+                        <div class="btn btn-outline-secondary">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="Pelicula" {{chks[2]}}>
+                                <label class="form-check-label" for="inlineRadio1">Película</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="Serie" {{chks[3]}}>
+                                <label class="form-check-label" for="inlineRadio2">Serie</label>
+                            </div>
+                        </div>
+                        &nbsp;de&nbsp;
+                        <div class="btn-group shadow-0" role="group" aria-label="Basic example">
+                            <button type="submit" id="intent" name="intent" value="CF" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Ciencia Ficción</button>
+                            <button type="submit" id="intent" name="intent" value="S" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Suspenso</button>
+                            <button type="submit" id="intent" name="intent" value="C" class="btn btn-outline-secondary" data-mdb-color="dark" data-mdb-ripple-init>Comedia</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 {% include 'perfil.html' %}
-{% endblock %}
-{% block scripts %}
 <script language="javascript">
     scrollToBottom("ScrollableDiv");
+    showMessageDiv()
 </script>
 {% endblock %}
 
