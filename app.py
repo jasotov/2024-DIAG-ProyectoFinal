@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 from db import db, db_config
 from models import User, Message, Session
 from sqlalchemy import desc
+import pytz
+
+timezone = pytz.timezone('America/Santiago')
 
 # Carga variables de entorno desde .env
 load_dotenv()
