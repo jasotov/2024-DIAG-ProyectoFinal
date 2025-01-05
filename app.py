@@ -48,8 +48,16 @@ def chat(user_id, case):
             session = Session(user_id=user.id)
             db.session.add(session)
 
+            sPreferences = Preferences(user.fav_movies,user.fav_series,user.kind_movies)
+
             # Guarda el primer mensaje de la sesión en la BD
-            sMsg = f"Hola {user.name}! Soy Verflix, y mi rol es recomendar películas ó series. ¿En qué te puedo ayudar?"
+            sMsg = f"Hola {user.name}! Soy Verflix, y mi rol es recomendar películas ó series."
+
+            if len(sPreferences) > 0:
+                sMsg += f' Se que tus preferencias son las siguientes: {sPreferences}.'
+            
+            sMsg += ' ¿En qué te puedo ayudar?.'
+
             db.session.add(Message(content=sMsg, author="assistant", user=user, session=session))
             db.session.commit()
         else:
@@ -59,64 +67,76 @@ def chat(user_id, case):
         Checks = [sChkF,sChkQ,sChk1,sChk2]
 
         return render_template('chat.html', messages=user.messages, usr=user, chks=Checks)
-
-    intent = request.form.get('intent')
-
-    sMsgType =  request.form.get('MsgType')
-    if sMsgType == 'QuickMsg':
-        sChkF = ''
-        sChkQ = 'checked'
-
-    sType =  request.form.get('inlineRadioOptions')
-    if sType == 'Serie':
-        sChk1 = ''
-        sChk2 = 'checked'
-
-    Checks = [sChkF,sChkQ,sChk1,sChk2]
-
-    intents = {
-        'CF': f'Recomiéndame una {sType} de ciencia ficción',
-        'S': f'Recomiéndame una {sType} de acción',
-        'C': f'Recomiéndame una {sType} de comedia',
-        'Enviar': request.form.get('message')
-    }
-
-    if intent in intents:
-        session = db.session.query(Session).filter(Session.user_id == user_id).order_by(desc(Session.created_at)).first()
-        user_message = intents[intent]
-
-        # Guardar nuevo mensaje en la BD
-        db.session.add(Message(content=user_message, author="user", user=user, session=session))
+    
+    if request.form.get('nombre'):
+        user.name = request.form.get('nombre')
+        user.fav_movies = request.form.get('fav_movies')
+        user.fav_series = request.form.get('fav_series')
+        user.kind_movies = request.form.get('kind_movies')
         db.session.commit()
+        db.session.refresh(user)
 
-        sMsg = "Eres un chatbot que recomienda películas y series, te llamas 'Verflix'. Tu rol es responder recomendaciones de manera breve y concisa. No repitas recomendaciones."
+        return render_template('landing.html', usr=user)
 
-        sPreferences = Preferences(user.fav_movies,user.fav_series,user.kind_movies)
-        if len(sPreferences) > 0:
-            sMsg += f'Para recomendar, considera los gustos del usuario que te está preguntando, que son los siguientes: {sPreferences}'
+    else:
 
-        messages_for_llm = [{
-            "role": "system",
-            "content": sMsg,
-        }]
+        intent = request.form.get('intent')
 
-        for message in user.messages:
-            messages_for_llm.append({
-                "role": message.author,
-                "content": message.content,
-            })
+        sMsgType =  request.form.get('MsgType')
+        if sMsgType == 'QuickMsg':
+            sChkF = ''
+            sChkQ = 'checked'
 
-        chat_completion = client.chat.completions.create(
-            messages=messages_for_llm,
-            model="gpt-4o",
-            temperature=1
-        )
+        sType =  request.form.get('inlineRadioOptions')
+        if sType == 'Serie':
+            sChk1 = ''
+            sChk2 = 'checked'
 
-        model_recommendation = chat_completion.choices[0].message.content
-        db.session.add(Message(content=model_recommendation, author="assistant", user=user, session=session))
-        db.session.commit()
+        Checks = [sChkF,sChkQ,sChk1,sChk2]
 
-        return render_template('chat.html', messages=user.messages, usr=user, chks=Checks)
+        intents = {
+            'CF': f'Recomiéndame una {sType} de ciencia ficción',
+            'S': f'Recomiéndame una {sType} de acción',
+            'C': f'Recomiéndame una {sType} de comedia',
+            'Enviar': request.form.get('message')
+        }
+
+        if intent in intents:
+            session = db.session.query(Session).filter(Session.user_id == user_id).order_by(desc(Session.created_at)).first()
+            user_message = intents[intent]
+
+            # Guardar nuevo mensaje en la BD
+            db.session.add(Message(content=user_message, author="user", user=user, session=session))
+            db.session.commit()
+
+            sMsg = "Eres un chatbot que recomienda películas y series, te llamas 'Verflix'. Tu rol es responder recomendaciones de manera breve y concisa. No repitas recomendaciones."
+
+            sPreferences = Preferences(user.fav_movies,user.fav_series,user.kind_movies)
+            if len(sPreferences) > 0:
+                sMsg += f'Para recomendar, considera los gustos del usuario que te está preguntando, que son los siguientes: {sPreferences}'
+
+            messages_for_llm = [{
+                "role": "system",
+                "content": sMsg,
+            }]
+
+            for message in user.messages:
+                messages_for_llm.append({
+                    "role": message.author,
+                    "content": message.content,
+                })
+
+            chat_completion = client.chat.completions.create(
+                messages=messages_for_llm,
+                model="gpt-4o",
+                temperature=1
+            )
+
+            model_recommendation = chat_completion.choices[0].message.content
+            db.session.add(Message(content=model_recommendation, author="assistant", user=user, session=session))
+            db.session.commit()
+
+            return render_template('chat.html', messages=user.messages, usr=user, chks=Checks)
 
 
 @app.route('/user/<username>')
@@ -168,13 +188,13 @@ def Preferences(sFavMovies, sFavSeries, sFavKinds):
 
     if len(sFavSeries) > 0:
         if len(sMsg) > 0:
-            sMsg += ';'
+            sMsg += '; '
 
         sMsg += f'series favoritas: {sFavSeries}'
 
     if len(sFavKinds) > 0:
         if len(sMsg) > 0:
-            sMsg += ';'
+            sMsg += '; '
 
         sMsg += f'géneros favoritos de películas y series: {sFavKinds}'
 
