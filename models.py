@@ -6,18 +6,20 @@ from sqlalchemy import (
     String,
     Text,
     DateTime,
+    Boolean,
     ForeignKey,
 )
 from datetime import datetime
 import pytz
+from flask_login import UserMixin
 
-
-class User(db.Model):
+class User(db.Model, UserMixin):
    __tablename__ = "user"
 
    id = Column(Integer, primary_key=True, autoincrement=True)
    created_at = Column(DateTime, default=datetime.now(pytz.timezone('America/Santiago')))
    email = Column(String, nullable=False, unique=True)
+   password = Column(String, nullable=False)
    name = Column(String, nullable=False, unique=False)
    fav_movies = Column(String, nullable=False, unique=False)
    fav_series = Column(String, nullable=False, unique=False)

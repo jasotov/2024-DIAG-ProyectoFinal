@@ -1,3 +1,19 @@
+function password_show_hide(tbPasswordId,ShowEyeId,HideEyeId) {
+    var x = document.getElementById(tbPasswordId);
+    var show_eye = document.getElementById(ShowEyeId);
+    var hide_eye = document.getElementById(HideEyeId);
+    hide_eye.classList.remove("d-none");
+    if (x.type === "password") {
+        x.type = "text";
+        show_eye.style.display = "none";
+        hide_eye.style.display = "block";
+    } else {
+        x.type = "password";
+        show_eye.style.display = "block";
+        hide_eye.style.display = "none";
+    }
+}
+
 function scrollToBottom(sDivId) {
     scrollableDiv = document.getElementById(sDivId);
     scrollableDiv.scrollTop = scrollableDiv.scrollHeight;
@@ -25,5 +41,18 @@ function showMessageDiv() {
     else {
         document.getElementById("FreeMsgDiv").style.display = 'none';
         document.getElementById("QuickMsgDiv").style.display = 'block';
+    }
+}
+
+function submitLogin(button) {
+    email = document.getElementById("email").value.trim();
+    pwd = document.getElementById("password").value.trim();
+    form = document.getElementById("login");
+    if (email != '' && pwd != '') {
+        button.disabled = true;
+        form.submit();
+    }
+    else {
+        form.className = 'was-validated'; 
     }
 }

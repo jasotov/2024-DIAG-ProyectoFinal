@@ -5,7 +5,7 @@
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Próximamente: Verflix</title>
+        <title>Verflix</title>
         {% endblock %}
         {% block styles %}
             <!-- Bootstrap CSS -->
@@ -14,9 +14,17 @@
         <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/site.css') }}">
         <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/sweetalert2.bundle.css') }}">
         <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/animate.min.css') }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
         <script src="{{ url_for('static', filename='js/sweetalert2.bundle.js') }}"></script>
         <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
         <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+        <style>
+            form i {
+                margin-left: -30px;
+                cursor: pointer;
+            }
+        </style>
     </head>
     <body class="d-flex flex-column vh-100 bg-dark text-white">
         <header class="p-3 text-bg-dark">
@@ -38,11 +46,14 @@
                 <div class="col dropdown text-end">
                     <div class="btn-group">
                         <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="{{ url_for('static', filename='images/avatar-m.png') }}" title="{{usr.name}}" width="32" height="32" class="rounded-circle">
+                            <img src="{{ url_for('static', filename='images/avatar-m.png') }}" title="" width="32" height="32" class="rounded-circle">
                         </a>
                         <ul class="dropdown-menu text-small">
+                            {% if usr %}
                             <li><a class="dropdown-item" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#ModalPerfil">Perfil</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout')}}" style="cursor: pointer;">Cerrar sesión</a></li>
                             <li><hr class="dropdown-divider"></li>
+                            {% endif %}
                             <li><a class="dropdown-item" style="cursor: pointer;" onclick="sweetAlert2('Verflix','Desarrollado por el Grupo 13:<br><br>Francisca Ibáñez<br>Humberto Jiménez<br>Juan Antonio Soto<br><br>Enero 2025','info'); return false;">Acerca de</a></li>
                         </ul>
                     </div>

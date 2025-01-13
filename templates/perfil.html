@@ -1,4 +1,4 @@
-<form method="POST" id="form1">
+<form method="POST" id="form1" action="{{ url_for('profile')}}">
     <div class="modal fade" tabindex="-1" id="ModalPerfil" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -19,15 +19,15 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="fav_movies">Películas Favoritas</label>
-                        <input type="text" id="fav_movies" name="fav_movies" class="form-control" value="{{usr.fav_movies}}" maxlength="100" required />
+                        <input type="text" id="fav_movies" name="fav_movies" class="form-control" value="{{usr.fav_movies}}" maxlength="100" />
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="fav_series">Series Favoritas</label>
-                        <input type="text" id="fav_series" name="fav_series" class="form-control" value="{{usr.fav_series}}" maxlength="100" required />
+                        <input type="text" id="fav_series" name="fav_series" class="form-control" value="{{usr.fav_series}}" maxlength="100" />
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="kind_movies">Géneros Favoritos</label>
-                        <input type="text" id="kind_movies" name="kind_movies" class="form-control" value="{{usr.kind_movies}}" maxlength="100" required />
+                        <input type="text" id="kind_movies" name="kind_movies" class="form-control" value="{{usr.kind_movies}}" maxlength="100" />
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -4,10 +4,11 @@
 <div class="container col-md-10 px-2 py-2 h-100">
     <div class="card" style="max-height: 600px; vertical-align: middle;">
         <div class="card-header" style="text-align: center;">
-            Chatbot
+            Verflix
         </div>
         <div class="card-body overflow-y-auto" id="ScrollableDiv">
             <div class=" px-4 py-5" >
+                {% if messages %}
                 <hr class="hr-text" data-content="Nueva sesión - {{messages[0].session.created_at.strftime('%d/%m/%Y')}}">
                 {% for message in messages %}
                     {% if loop.index0 > 0 %}
@@ -40,11 +41,12 @@
                         </div>
                     {% endif %}
                 {% endfor %}
+                {% endif %}
             </div>
         </div>
         <div class="card-footer">
             <div style="font-size: small;">
-                Mensaje&nbsp;&nbsp;
+                Tipo mensaje :&nbsp;&nbsp;
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="MsgType" id="MsgType1" value="FreeMsg" onclick="showMessageDiv()" {{chks[0]}}>
                     <label class="form-check-label" for="MsgType1">libre</label>
