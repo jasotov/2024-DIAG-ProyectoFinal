@@ -25,7 +25,12 @@
                     </div>
                     <div class="d-grid gap-2">
                         <br/>
-                        <button class="btn btn-primary px-4 me-md-2" type="submit">Login</button>
+                        <button class="btn btn-primary px-4 me-md-2" onclick="submitLogin(this);">
+                            <div class="d-flex justify-content-center">
+                                <span id="text">Login</span>
+                                <span class="spinner-border spinner-border-sm" id="spinner" style="display: none;"></span>
+                            </div>
+                        </button>   
                     </div>
                 </div>
             </div>

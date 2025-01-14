@@ -28,11 +28,9 @@ client = OpenAI()
 
 app = Flask(__name__)
 app.secret_key = getenv('SECRET_KEY')
-#app.config["SESSION_PERMANENT"] = False
-#app.config["SESSION_TYPE"] = "filesystem"
-#Session(app)
 
 bootstrap = Bootstrap5(app)
+#csrf = CSRFProtect(app)
 login_manager.init_app(app)
 bcrypt = Bcrypt(app)
 db_config(app)
@@ -246,6 +244,7 @@ def chat():
             )
 
             model_recommendation = chat_completion.choices[0].message.content
+
             db.session.add(Message(content=model_recommendation, 
                                    author="assistant",
                                    created_at=datetime.now(pytz.timezone('America/Santiago')), 
@@ -253,6 +252,14 @@ def chat():
                                    session=sesion))
             db.session.commit()
 
+            # accept_header = request.headers.get('Accept')
+            # if accept_header and 'application/json' in accept_header:
+            #     last_message = user.messages[-1]
+            #     return jsonify({
+            #         'author': last_message.author,
+            #         'content': last_message.content,
+            #     })
+    
             return render_template('chat.html', messages=user.messages, usr=user, chks=Checks)
 
 @app.route('/profile', methods=['POST'])

@@ -7,7 +7,7 @@
             Verflix
         </div>
         <div class="card-body overflow-y-auto" id="ScrollableDiv">
-            <div class=" px-4 py-5" >
+            <div class="px-4 py-5" id="messages">
                 {% if messages %}
                 <hr class="hr-text" data-content="Nueva sesión - {{messages[0].session.created_at.strftime('%d/%m/%Y')}}">
                 {% for message in messages %}
@@ -61,7 +61,7 @@
                     <div class="input-group my-3">
                         <input type="hidden" id="intent" name="intent" value="Enviar"/>
                         <input name="message" id="message" required="required" class="form-control" placeholder="Enviar mensaje a Verflix" aria-label="Tu mensaje" aria-describedby="send-message"/>
-                        <button class="btn btn-primary" onclick="submitMessage(this)">
+                        <button class="btn btn-primary disabled" id="send-message" onclick="submitFreeMessage();">
                             <span id="text">Enviar</span>
                             <span class="spinner-border spinner-border-sm" id="spinner" style="display: none;"></span>
                         </button>   
@@ -99,6 +99,7 @@
     </div>
 </div>
 {% include 'perfil.html' %}
+<script language="javascript" src="{{ url_for('static', filename='js/chat.js') }}"></script>
 <script language="javascript">
     scrollToBottom("ScrollableDiv");
     showMessageDiv()
