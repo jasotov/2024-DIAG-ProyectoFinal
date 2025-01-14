@@ -202,9 +202,9 @@ def chat():
         Checks = [sChkF,sChkQ,sChk1,sChk2]
 
         intents = {
-            'CF': f'Recomiéndame una {sType} de ciencia ficción',
-            'S': f'Recomiéndame una {sType} de acción',
-            'C': f'Recomiéndame una {sType} de comedia',
+            'CF': f'Recomiéndame una {sType} del género ciencia ficción',
+            'S': f'Recomiéndame una {sType} del género suspenso',
+            'C': f'Recomiéndame una {sType} del género comedia',
             'Enviar': request.form.get('message')
         }
 

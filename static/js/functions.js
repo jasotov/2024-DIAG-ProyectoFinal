@@ -59,6 +59,33 @@ function submitLogin(button) {
     }
 }
 
+function submitSignup(button) {
+    email = document.getElementById("email").value.trim();
+    nombre = document.getElementById("nombre").value.trim();
+    pwd1 = document.getElementById("password1").value.trim();
+    pwd2 = document.getElementById("password2").value.trim();
+    form = document.getElementById("signup");
+    if (email != '' && validateEmail(email) && nombre != '' && pwd1 != '' && pwd2 != '' && pwd1 == pwd2 ) {
+
+        var ucase = new RegExp("[A-Z]+");
+        var lcase = new RegExp("[a-z]+");
+        var num = new RegExp("[0-9]+");
+
+        if (pwd1.length >= 8 && ucase.test(pwd1) && lcase.test(pwd1) && num.test(pwd1)) {
+            button.disabled = true;
+            document.getElementById("text").style.display = 'none';
+            document.getElementById("spinner").style.display = 'block';
+            form.submit();
+        }
+        else {
+            form.className = 'was-validated'; 
+        }
+    }
+    else {
+        form.className = 'was-validated'; 
+    }
+}
+
 function validateEmail(email){
 	var validEmail =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
 

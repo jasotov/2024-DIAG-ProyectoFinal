@@ -52,6 +52,8 @@ function addMessageToChat(message) {
 }
 
 function submitFreeMessage() {
+    messageInput = document.getElementById('message');
+    submitButton = document.getElementById('send-message');
     const form = document.getElementById("formchat2");
     const formData = new FormData(form);
 
@@ -74,9 +76,53 @@ function submitFreeMessage() {
     scrollToBottom("ScrollableDiv");
 
     form.submit();
-
-    //messageInput.value = '';
 }
+
+function submitQuickMessage() {
+    chk1 = document.getElementById('inlineRadio1');
+    chk2 = document.getElementById('inlineRadio2');
+    submitButtonCF = document.getElementById('intentCF');
+    submitButtonS = document.getElementById('intentS');
+    submitButtonC = document.getElementById('intentC');
+    const form = document.getElementById("formchat1");
+
+    chk1.disabled = true;
+    chk2.disabled = true;
+    submitButtonCF.classList.add('disabled');
+    submitButtonS.classList.add('disabled');
+    submitButtonC.classList.add('disabled');
+
+    if (chk1.checked) {
+        sType =  'Pelicula';
+    }
+    else {
+        sType =  'Serie';
+    }
+    sMsg = 'Recomiéndame una ' + sType + ' del género ';
+    if (submitButton.value == 'CF') {
+        sMsg += 'ciencia ficción'
+    } else if (submitButton.value == 'S') {
+        sMsg += 'suspenso'
+    } else {
+        sMsg += 'comedia'
+    }
+
+    addMessageToChat({
+        content: sMsg,
+        author: 'user',
+    });
+
+
+    addMessageToChat({
+        content: '',
+        author: 'assistant',
+    });
+
+    scrollToBottom("ScrollableDiv");
+
+    form.submit();
+}
+
 
 function getCurrentTime() {
     let CurrentTime = '';
