@@ -78,7 +78,7 @@ function submitFreeMessage() {
     form.submit();
 }
 
-function submitQuickMessage() {
+function submitQuickMessage(submittedButton) {
     chk1 = document.getElementById('inlineRadio1');
     chk2 = document.getElementById('inlineRadio2');
     submitButtonCF = document.getElementById('intentCF');
@@ -99,9 +99,9 @@ function submitQuickMessage() {
         sType =  'Serie';
     }
     sMsg = 'Recomiéndame una ' + sType + ' del género ';
-    if (submitButton.value == 'CF') {
+    if (submittedButton.value == 'CF') {
         sMsg += 'ciencia ficción'
-    } else if (submitButton.value == 'S') {
+    } else if (submittedButton.value == 'S') {
         sMsg += 'suspenso'
     } else {
         sMsg += 'comedia'
@@ -119,6 +119,9 @@ function submitQuickMessage() {
     });
 
     scrollToBottom("ScrollableDiv");
+
+    chk1.disabled = false;
+    chk2.disabled = false;
 
     form.submit();
 }

@@ -17,7 +17,7 @@ from bot import build_prompt, search_movie_or_tv_show, where_to_watch
 from sqlalchemy import desc
 from datetime import datetime
 import pytz
-from markupsafe import Markup
+#from markupsafe import Markup
 
 # Carga variables de entorno desde .env
 load_dotenv()
@@ -259,7 +259,8 @@ def chat():
 
                 urls = FindURLs(model_recommendation)
                 for url in urls:
-                    model_recommendation = Markup(model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>'))
+                    #model_recommendation = Markup(model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>'))
+                    model_recommendation = model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>')
 
             else:
                 model_recommendation = chat_completion.choices[0].message.content
