@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container col-md-10 px-2 py-2 h-100">
     <div class="card" style="max-height: 600px; vertical-align: middle;">
-        <div class="card-header" style="text-align: center;">
+        <div class="card-header" style="text-align: center; color: #cc3333;">
             Verflix
         </div>
         <div class="card-body overflow-y-auto" id="ScrollableDiv">
@@ -21,7 +21,7 @@
                             <img class="bg-white rounded-circle" src="{{ url_for('static', filename='images/avatar_verflix_3.png') }}" title="verflix" style="width: 45px; height: 45px;">
                             <div>
                                 <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
-                                    <p class="small mb-0">{{message.content}}</p>
+                                    <p class="small mb-0">{{message.content|safe}}</p>
                                 </div>
                                 <div>
                                     <p class="small ms-3 mb-3 rounded-3 text-muted" style="font-size: x-small; text-align: right;">{{message.created_at.strftime('%H:%M')}}</p>

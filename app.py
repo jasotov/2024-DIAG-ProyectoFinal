@@ -8,14 +8,16 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from db import db, db_config
 from models import User, Message, Session
+from functions import Preferences, getTools, FindURLs
 #from forms import ProfileForm, SignUpForm, LoginForm
 #from flask_wtf.csrf import CSRFProtect
 from os import getenv
 import json
-#from bot import search_movie_or_tv_show, where_to_watch
+from bot import build_prompt, search_movie_or_tv_show, where_to_watch
 from sqlalchemy import desc
 from datetime import datetime
 import pytz
+from markupsafe import Markup
 
 # Carga variables de entorno desde .env
 load_dotenv()
@@ -220,15 +222,9 @@ def chat():
                                    session=sesion))
             db.session.commit()
 
-            sMsg = "Eres un chatbot que recomienda películas y series, te llamas 'Verflix'. Tu rol es responder recomendaciones de manera breve y concisa. No repitas recomendaciones."
-
-            sPreferences = Preferences(user.fav_movies,user.fav_series,user.kind_movies)
-            if len(sPreferences) > 0:
-                sMsg += f'Para recomendar, considera los gustos del usuario que te está preguntando, que son los siguientes: {sPreferences}'
-
             messages_for_llm = [{
                 "role": "system",
-                "content": sMsg,
+                "content": build_prompt(user, ''),
             }]
 
             for message in user.messages:
@@ -240,10 +236,33 @@ def chat():
             chat_completion = client.chat.completions.create(
                 messages=messages_for_llm,
                 model="gpt-4o",
-                temperature=1
+                temperature=1,
+                tools = getTools()
             )
 
-            model_recommendation = chat_completion.choices[0].message.content
+            model_recommendation = ''
+
+            if chat_completion.choices[0].message.tool_calls:
+                tool_call = chat_completion.choices[0].message.tool_calls[0]
+
+                if tool_call.function.name == 'where_to_watch':
+                    arguments = json.loads(tool_call.function.arguments)
+                    name = arguments['name']
+                    model_recommendation = where_to_watch(client, name, user)
+                elif tool_call.function.name == 'search_movie_or_tv_show':
+                    arguments = json.loads(tool_call.function.arguments)
+                    name = arguments['name']
+                    model_recommendation = search_movie_or_tv_show(client, name, user)
+
+                model_recommendation = model_recommendation.replace('- **','<br/><b>')
+                model_recommendation = model_recommendation.replace('**','</b>')
+
+                urls = FindURLs(model_recommendation)
+                for url in urls:
+                    model_recommendation = Markup(model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>'))
+
+            else:
+                model_recommendation = chat_completion.choices[0].message.content
 
             db.session.add(Message(content=model_recommendation, 
                                    author="assistant",
@@ -252,14 +271,6 @@ def chat():
                                    session=sesion))
             db.session.commit()
 
-            # accept_header = request.headers.get('Accept')
-            # if accept_header and 'application/json' in accept_header:
-            #     last_message = user.messages[-1]
-            #     return jsonify({
-            #         'author': last_message.author,
-            #         'content': last_message.content,
-            #     })
-    
             return render_template('chat.html', messages=user.messages, usr=user, chks=Checks)
 
 @app.route('/profile', methods=['POST'])
@@ -292,24 +303,3 @@ def profile():
     return render_template('landing.html', usr=user)
 
 
-def Preferences(sFavMovies, sFavSeries, sFavKinds):
-# ---------------------------------------------------------------------------------------------------------------
-# Concatena las preferencias del usuario  
-# ---------------------------------------------------------------------------------------------------------------
-    sMsg = ''
-    if len(sFavMovies) > 0:
-        sMsg = f'películas favoritas: {sFavMovies}'
-
-    if len(sFavSeries) > 0:
-        if len(sMsg) > 0:
-            sMsg += '; '
-
-        sMsg += f'series favoritas: {sFavSeries}'
-
-    if len(sFavKinds) > 0:
-        if len(sMsg) > 0:
-            sMsg += '; '
-
-        sMsg += f'géneros favoritos de películas y series: {sFavKinds}'
-
-    return sMsg
