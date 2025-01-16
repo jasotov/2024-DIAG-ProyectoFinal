@@ -13,7 +13,7 @@ from functions import Preferences, getTools, FindURLs
 #from flask_wtf.csrf import CSRFProtect
 from os import getenv
 import json
-from bot import build_prompt, search_movie_or_tv_show, where_to_watch
+from bot import build_prompt, search_movie_or_tv_show, where_to_watch, search_trailer
 from sqlalchemy import desc
 from datetime import datetime
 import pytz
@@ -241,6 +241,7 @@ def chat():
             )
 
             model_recommendation = ''
+            #print(chat_completion)
 
             if chat_completion.choices[0].message.tool_calls:
                 tool_call = chat_completion.choices[0].message.tool_calls[0]
@@ -253,17 +254,21 @@ def chat():
                     arguments = json.loads(tool_call.function.arguments)
                     name = arguments['name']
                     model_recommendation = search_movie_or_tv_show(client, name, user)
+                elif tool_call.function.name == 'search_trailer':
+                    arguments = json.loads(tool_call.function.arguments)
+                    name = arguments['name']
+                    model_recommendation = search_trailer(client, name, user)
 
                 model_recommendation = model_recommendation.replace('- **','<br/><b>')
                 model_recommendation = model_recommendation.replace('**','</b>')
 
-                urls = FindURLs(model_recommendation)
-                for url in urls:
-                    #model_recommendation = Markup(model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>'))
-                    model_recommendation = model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>')
-
             else:
                 model_recommendation = chat_completion.choices[0].message.content
+
+            urls = FindURLs(model_recommendation)
+            for url in urls:
+                #model_recommendation = Markup(model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>'))
+                model_recommendation = model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>')
 
             db.session.add(Message(content=model_recommendation, 
                                    author="assistant",

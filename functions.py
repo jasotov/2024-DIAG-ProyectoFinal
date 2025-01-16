@@ -75,6 +75,26 @@ def getTools():
                     "additionalProperties": False
                 }
             },
+        },
+        {
+            'type': 'function',
+            'function': {
+                "name": "search_trailer",
+                "description": "Returns information about trailer of a specified movie.",
+                "parameters": {
+                    "type": "object",
+                    "required": [
+                        "name"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the movie for which you are looking for the trailer"
+                        }
+                    },
+                    "additionalProperties": False
+                }
+            },
         }
     ]
 

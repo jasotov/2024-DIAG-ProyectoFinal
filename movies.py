@@ -1,5 +1,6 @@
 from simplejustwatchapi.justwatch import search as justwatch_search
 import tmdbsimple as tmdb
+from googleapiclient.discovery import build
 from dotenv import load_dotenv
 from os import getenv
 
@@ -13,6 +14,7 @@ def search(movie_name):
 
     if not search.results:
         return None
+    print(search.results[0])
 
     return search.results[0]
 
@@ -33,42 +35,53 @@ def search_platforms(movie_name):
 
     return platforms
 
-# def get_overview(movie_name):
-#     # Buscar la película por nombre
+# def get_movie_trailer(movie_name):
 #     search = tmdb.Search()
-#     response = search.multi(query=movie_name, language='es-CL')
+#     response = search.movie(query=movie_name)
+    
+#     if response['results']:
+#         try:
+#             movie_id = response['results'][0]['id']
+#             movie = tmdb.Movies(movie_id)
+#             videos = movie.videos()
+            
+#             for video in videos['results']:
+#                 if video['type'] == 'Trailer' and video['site'] == 'YouTube':
+#                     return f"https://www.youtube.com/watch?v={video['key']}"
+#         except:
+#             return "No se encontró el tráiler."
+    
+#     return "No se encontró el tráiler."
 
-#     if not search.results:
-#         return None
+DEVELOPER_KEY = getenv('DEVELOPER_KEY')
+YOUTUBE_API_SERVICE_NAME = 'youtube'
+YOUTUBE_API_VERSION = 'v3'
 
-#     overview = response['results'][0]['overview']
+def search_youtube(movie_name):
+    try:
+        youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
+                    developerKey=DEVELOPER_KEY)
 
-#     return watch_providers, poster_url, puntuacion, descripcion
+        search_response = youtube.search().list(
+                            q=movie_name + ' trailer',
+                            part='id,snippet',
+                            maxResults=3,
+                            type='video'
+                        ).execute()
 
-# def get_overview(movie_name):
-#     # Buscar la película por nombre
-#     search = tmdb.Search()
-#     response = search.multi(query=movie_name, language='es-CL')
+        #print(search_response)
 
-#     if not response['results']:
-#         return None, None, None, None
+        sMsg = ''
+        for search_result in search_response.get('items', []):
 
-#     # Obtener el ID de la primera película encontrada
-#     movie_id = response['results'][0]['id']
-#     poster_path = response['results'][0]['poster_path']
-#     puntuacion = response['results'][0]['vote_average']
-#     descripcion = response['results'][0]['overview']
+            print(search_result)
 
-#     # Obtener los proveedores de visualización para la película
-#     movie = tmdb.Movies(movie_id)
-#     providers_response = movie.watch_providers()
+            if search_result['id']['kind'] == 'youtube#video':
+                sMsg = f'El tráiler de la película {movie_name} está disponible en Youtube (https://www.youtube.com/watch?v={search_result["id"]["videoId"]})'
+                #print(sMsg)
 
-#     if 'results' in providers_response and 'CL' in providers_response['results']:
-#         watch_providers = providers_response['results']['CL']['flatrate']
-#     else:
-#         watch_providers = None
+                return sMsg
 
-#     # Construir la URL del póster
-#     poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else None
-
-#     return watch_providers, poster_url, puntuacion, descripcion
+        return 'El tráiler de la película {movie_name} no encontrado'
+    except:
+        return 'El tráiler de la película {movie_name} no encontrado'
