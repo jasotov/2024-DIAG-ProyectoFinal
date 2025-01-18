@@ -6,7 +6,7 @@ from functions import Preferences
 
 def build_prompt(user: User, context: str):
     system_prompt = "Eres un chatbot que recomienda películas y series, te llamas 'Flixie' y eres operador de 'Verflix'. Tu rol es responder recomendaciones de manera breve y concisa. No repitas recomendaciones."
-    system_prompt += 'Si te preguntan por el afiche, poster, trailer o video de una película o serie prefiere utilizar tool_calls para obtener la información.'
+    #system_prompt += 'Si te preguntan por el afiche, poster, trailer o video de una película o serie prefiere utilizar tool_calls para obtener la información.'
 
     sPreferences = Preferences(user.fav_movies,user.fav_series,user.kind_movies)
     if len(sPreferences) > 0:

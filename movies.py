@@ -14,10 +14,14 @@ def search(movie_name):
 
     if not search.results:
         return None
-    print(search.results[0])
+    
+    # TMDB, en algunos casos, devuelve registros incompletos. Estos casos serán omitidos.
+    for i in range(0,len(search.results)):
+        if search.results[i]['poster_path'] and search.results[i]['genre_ids'] and search.results[i]['release_date']:
+            if (len(search.results[i]['poster_path']) > 0 or len(search.results[i]['genre_ids']) > 0) and len(search.results[i]['release_date']) > 0:
+                return search.results[i]
 
-    return search.results[0]
-
+    return None
 
 def search_platforms(movie_name):
     results = justwatch_search(movie_name, "CL", "es")

@@ -167,11 +167,11 @@ def chat():
 
             if len(sPreferences) > 0:
                 if session['newpreferences'] == '0':
-                    sMsg += f'<br/>Se que tus preferencias son las siguientes: {sPreferences}.'
+                    sMsg += f'<br/><br/>Se que tus preferencias son las siguientes: {sPreferences}.'
                 else:
-                    sMsg += f'<br/>Se que tus nuevas preferencias son las siguientes: {sPreferences}.'
+                    sMsg += f'<br/><br/>Se que tus nuevas preferencias son las siguientes: {sPreferences}.'
             
-            sMsg += '<br/>¿En qué te puedo ayudar?.'
+            sMsg += '<br/><br/>¿En qué te puedo ayudar?.'
 
             db.session.add(Message(content=sMsg, 
                                    author="assistant", 
