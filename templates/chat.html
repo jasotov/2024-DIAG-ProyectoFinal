@@ -101,9 +101,9 @@
 {% include 'perfil.html' %}
 <script language="javascript" src="{{ url_for('static', filename='js/chat.js') }}"></script>
 <script language="javascript">
-    scrollToBottom("ScrollableDiv");
     showMessageDiv();
     document.getElementById("message").focus();
+    scrollToBottom("ScrollableDiv");
 </script>
 {% endblock %}
 
