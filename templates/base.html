@@ -26,12 +26,12 @@
             }
         </style>
     </head>
-    <body class="d-flex flex-column vh-100 bg-dark text-white">
+    <body class="d-flex flex-column bg-dark text-white">
         <header class="p-3 text-bg-dark">
             <div class="container">
               <div class="col d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
-                    <img src="{{ url_for('static', filename='images/logo-verflix.png') }}" title="Ir a Inicio" height="60">
+                    <img src="{{ url_for('static', filename='images/logo-verflix-3.png') }}" title="Ir a Inicio" height="60">
                 </a>
                 <div class="col dropdown text-end">
                     <div class="btn-group">
@@ -44,7 +44,7 @@
                             <li><a class="dropdown-item" href="{{ url_for('logout')}}" style="cursor: pointer;">Cerrar sesión</a></li>
                             <li><hr class="dropdown-divider"></li>
                             {% endif %}
-                            <li><a class="dropdown-item" style="cursor: pointer;" onclick="sweetAlert2('Verflix','Desarrollado por el Grupo 13:<br><br>Francisca Ibáñez<br>Humberto Jiménez<br>Juan Antonio Soto<br><br>Enero 2025','info'); return false;">Acerca de</a></li>
+                            <li><a class="dropdown-item" style="cursor: pointer;" onclick="sweetAlert2('Verflix','Desarrollado por <b>DIAG Grupo 13</b>:<br><br>Francisca Ibáñez<br>Humberto Jiménez<br>Juan Antonio Soto<br><br>Versión 1.0 - Enero 2025','info'); return false;">Acerca de</a></li>
                         </ul>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
             </div>
         </header>
         <div class="b-divider"></div>
-        <div style="background-color: #1c1f23; height: 90%;">
+        <div class="overflow-y-auto" style="background-color: #1c1f23; height: 90%;">
             {% block content %}{% endblock %}
 
             {% block scripts %}
@@ -62,7 +62,7 @@
         </div>
         <div class="container mt-auto">
             <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-                <p class="col-md-6 mb-0 text-secondary">© 2025 Verflix - v.1.0</p>
+                <p class="col-md-6 mb-0 text-secondary">© 2025 Verflix</p>
                 <p class="col-md-6 mb-0 text-secondary" style="text-align: right;">Grupo 13</p>
             </footer>
         </div>

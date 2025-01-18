@@ -17,7 +17,8 @@ from bot import build_prompt, search_movie_or_tv_show, where_to_watch, search_tr
 from sqlalchemy import desc
 from datetime import datetime
 import pytz
-#from markupsafe import Markup
+import markdown
+import re
 
 # Carga variables de entorno desde .env
 load_dotenv()
@@ -162,15 +163,15 @@ def chat():
             sPreferences = Preferences(user.fav_movies,user.fav_series,user.kind_movies)
 
             # Guarda el primer mensaje de la sesión en la BD
-            sMsg = f"Hola {user.name}! Soy Verflix, y mi rol es recomendar películas ó series."
+            sMsg = f"Hola {user.name}! Soy Flixie, operadora de Verflix, y mi rol es recomendar películas ó series."
 
             if len(sPreferences) > 0:
                 if session['newpreferences'] == '0':
-                    sMsg += f' Se que tus preferencias son las siguientes: {sPreferences}.'
+                    sMsg += f'<br/>Se que tus preferencias son las siguientes: {sPreferences}.'
                 else:
-                    sMsg += f' Se que tus nuevas preferencias son las siguientes: {sPreferences}.'
+                    sMsg += f'<br/>Se que tus nuevas preferencias son las siguientes: {sPreferences}.'
             
-            sMsg += ' ¿En qué te puedo ayudar?.'
+            sMsg += '<br/>¿En qué te puedo ayudar?.'
 
             db.session.add(Message(content=sMsg, 
                                    author="assistant", 
@@ -259,16 +260,23 @@ def chat():
                     name = arguments['name']
                     model_recommendation = search_trailer(client, name, user)
 
-                model_recommendation = model_recommendation.replace('- **','<br/><b>')
-                model_recommendation = model_recommendation.replace('**','</b>')
+                #model_recommendation = model_recommendation.replace('- **','<br/><b>')
+                #model_recommendation = model_recommendation.replace('**','</b>')
+                #if '**' in model_recommendation:
+                #    model_recommendation = markdown.markdown(model_recommendation)
 
             else:
                 model_recommendation = chat_completion.choices[0].message.content
 
-            urls = FindURLs(model_recommendation)
-            for url in urls:
-                #model_recommendation = Markup(model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>'))
-                model_recommendation = model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>')
+            #urls = FindURLs(model_recommendation)
+            #for url in urls:
+                ##model_recommendation = Markup(model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>'))
+                #model_recommendation = model_recommendation.replace(url,f'<a href="{url}" target="_blank">click aquí</a>')
+
+            model_recommendation = markdown.markdown(model_recommendation)
+
+            model_recommendation = re.sub('<a href=','<a target="_blank" href=',model_recommendation)
+            model_recommendation = model_recommendation.replace('<img alt','<img width="50%" alt')
 
             db.session.add(Message(content=model_recommendation, 
                                    author="assistant",

@@ -74,7 +74,7 @@ def search_youtube(movie_name):
         sMsg = ''
         for search_result in search_response.get('items', []):
 
-            print(search_result)
+            #print(search_result)
 
             if search_result['id']['kind'] == 'youtube#video':
                 sMsg = f'El tráiler de la película {movie_name} está disponible en Youtube (https://www.youtube.com/watch?v={search_result["id"]["videoId"]})'
